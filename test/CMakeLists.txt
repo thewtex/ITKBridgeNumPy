@@ -1,15 +1,13 @@
 itk_module_test()
 
-set(ITKBufferConvertionTests
-itkPyBufferTest.cxx
-)
+set(NumPyConversionTests
+  itkPyBufferTest.cxx
+  )
 
-set(ITKBufferConvertion-Test_LIBRARIES
-    "${ITKBufferConvertion-Test_LIBRARIES};${PYTHON_LIBRARY}")
+set(NumPyConversion-Test_LIBRARIES "${NumPyConversion-Test_LIBRARIES};${PYTHON_LIBRARY}")
 
-CreateTestDriver(ITKBufferConvertion  "${ITKBufferConvertion-Test_LIBRARIES}"
-    "${ITKBufferConvertionTests}")
+CreateTestDriver(NumPyConversion "${NumPyConversion-Test_LIBRARIES}"
+  "${NumPyConversionTests}")
 
 itk_add_test(NAME itkPyBufferTest
-    COMMAND ITKBufferConvertionTestDriver itkPyBufferTest)
-
+  COMMAND NumPyConversionTestDriver itkPyBufferTest)

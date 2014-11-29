@@ -1,11 +1,8 @@
-#include <iostream>
-
 #include "NumpyHelper.h"
 
 #include "itkPyBuffer.h"
 #include "itkImage.h"
 #include "itkVectorImage.h"
-
 
 int itkPyBufferTest(int, char * [])
 {

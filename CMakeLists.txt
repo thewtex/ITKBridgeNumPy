@@ -1,7 +1,5 @@
-project(ITKBufferConvertion)
+project(NumPyConversion)
 
-set(ITKBufferConvertion_SYSTEM_INCLUDE_DIRS
-    "${PYTHON_NUMARRAY_INCLUDE_DIR};${PYTHON_INCLUDE_DIR}")
+set(NumPyConversion_SYSTEM_INCLUDE_DIRS "${NUMPY_INCLUDE_DIR};${PYTHON_INCLUDE_DIR}")
 
 itk_module_impl()
-

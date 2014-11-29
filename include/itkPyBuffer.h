@@ -28,7 +28,7 @@
 // The python header defines _POSIX_C_SOURCE without a preceding #undef
 #undef _POSIX_C_SOURCE
 #include <Python.h>
-#include <arrayobject.h>
+#include <numpy/arrayobject.h>
 
 
 namespace itk

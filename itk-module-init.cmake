@@ -1,11 +1,10 @@
-#
-# Find the packages required by this module
-#
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/CMake")
 
 find_package(PythonLibs REQUIRED)
-find_package(NUMARRAY REQUIRED)
+find_package(NumPy REQUIRED)
 
-if(NOT PYTHON_NUMARRAY_FOUND)
-    message(WARNING "Numpy not found. Please set PYTHON_NUMARRAY_INCLUDE_DIR.")
+if(NOT NUMPY_FOUND)
+  message(FATAL_ERROR "NumPy not found.
+
+  Please set NUMPY_INCLUDE_DIR to the location of numpy/arrayobject.h.")
 endif()
-

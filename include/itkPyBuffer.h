@@ -44,7 +44,7 @@ namespace itk
  *  array. This permits passing image buffers into python arrays from
  *  the NumPy python package.
  *
- *  \ingroup NumPyConversion
+ *  \ingroup BridgeNumPy
  */
 template <typename TImage>
 class PyBuffer

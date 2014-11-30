@@ -1,6 +1,6 @@
 if(ITK_WRAP_PYTHON)
 
-  itk_wrap_module(NumPyConversion)
+  itk_wrap_module(BridgeNumPy)
 
   set(WRAPPER_SWIG_LIBRARY_FILES ${WRAPPER_SWIG_LIBRARY_FILES} "${CMAKE_CURRENT_SOURCE_DIR}/PyBuffer.i")
 

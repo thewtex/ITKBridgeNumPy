@@ -1,13 +1,13 @@
 itk_module_test()
 
-set(NumPyConversionTests
+set(BridgeNumPyTests
   itkPyBufferTest.cxx
   )
 
-set(NumPyConversion-Test_LIBRARIES "${NumPyConversion-Test_LIBRARIES};${PYTHON_LIBRARY}")
+set(BridgeNumPy-Test_LIBRARIES "${BridgeNumPy-Test_LIBRARIES};${PYTHON_LIBRARY}")
 
-CreateTestDriver(NumPyConversion "${NumPyConversion-Test_LIBRARIES}"
-  "${NumPyConversionTests}")
+CreateTestDriver(BridgeNumPy "${BridgeNumPy-Test_LIBRARIES}"
+  "${BridgeNumPyTests}")
 
 itk_add_test(NAME itkPyBufferTest
-  COMMAND NumPyConversionTestDriver itkPyBufferTest)
+  COMMAND BridgeNumPyTestDriver itkPyBufferTest)

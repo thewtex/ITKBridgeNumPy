@@ -53,7 +53,7 @@ PyBuffer<TImage>
 
   const int numberOfComponents = image->GetNumberOfComponentsPerPixel();
 
-  const int item_type = PyTypeTraits<ComponentType>::value;
+  const int itemType = PyTypeTraits<ComponentType>::value;
 
   const int numpyArrayDimension = ( numberOfComponents > 1) ? ImageDimension + 1 : ImageDimension;
 
@@ -91,7 +91,7 @@ PyBuffer<TImage>
   const int flags = (keepAxes? NPY_ARRAY_F_CONTIGUOUS : NPY_ARRAY_C_CONTIGUOUS) |
               NPY_WRITEABLE;
 
-  PyObject * obj = PyArray_New(&PyArray_Type, numpyArrayDimension, dimensions, item_type, NULL, data, 0, flags, NULL);
+  PyObject * obj = PyArray_New(&PyArray_Type, numpyArrayDimension, dimensions, itemType, NULL, data, 0, flags, NULL);
 
   return obj;
 }

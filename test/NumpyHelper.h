@@ -21,24 +21,27 @@
 class NumpyHelper
 {
 public:
-    static void Initialize()
-    {
-        if ( instance == NULL )
-            instance = new NumpyHelper();
-    }
+  static void Initialize()
+  {
+    if ( instance == NULL )
+      {
+      instance = new NumpyHelper();
+      }
+  }
 
 protected:
-    NumpyHelper() {
-        Py_Initialize();
-        import_array();
-    }
+  NumpyHelper()
+  {
+    Py_Initialize();
+    import_array();
+  }
 
-    ~NumpyHelper()
-    {
-        Py_Finalize();
-    }
+  ~NumpyHelper()
+  {
+    Py_Finalize();
+  }
 
 private:
-    static NumpyHelper* instance;;
+    static NumpyHelper* instance;
 };
 NumpyHelper* NumpyHelper::instance = NULL;

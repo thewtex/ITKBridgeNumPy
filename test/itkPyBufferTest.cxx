@@ -6,45 +6,46 @@
 
 int itkPyBufferTest(int, char * [])
 {
-    try
-    {
-        NumpyHelper::Initialize();
 
-        const unsigned int Dimension = 3;
-        typedef unsigned char                                  PixelType;
-        typedef itk::Image<PixelType, Dimension>       ScalarImageType;
-        typedef itk::VectorImage<PixelType, Dimension> VectorImageType;
-        typedef itk::ImageRegion<Dimension>            RegionType;
+try
+  {
+  NumpyHelper::Initialize();
 
-        RegionType region;
-        region.SetSize(0,200);
-        region.SetSize(1,100);
-        region.SetSize(2,10);
-   
-        // Test for scalar image
-        ScalarImageType::Pointer scalarImage = ScalarImageType::New();
-        scalarImage->SetRegions(region);
-        scalarImage->Allocate();
+  const unsigned int Dimension = 3;
+  typedef unsigned char                                  PixelType;
+  typedef itk::Image<PixelType, Dimension>       ScalarImageType;
+  typedef itk::VectorImage<PixelType, Dimension> VectorImageType;
+  typedef itk::ImageRegion<Dimension>            RegionType;
 
-        PyObject* scalarPyBuffer = itk::PyBuffer<ScalarImageType>::GetArrayFromImage(scalarImage);
-        itk::PyBuffer<ScalarImageType>::GetImageFromArray(scalarPyBuffer);
+  RegionType region;
+  region.SetSize(0,200);
+  region.SetSize(1,100);
+  region.SetSize(2,10);
+
+  // Test for scalar image
+  ScalarImageType::Pointer scalarImage = ScalarImageType::New();
+  scalarImage->SetRegions(region);
+  scalarImage->Allocate();
+
+  PyObject* scalarPyBuffer = itk::PyBuffer<ScalarImageType>::GetArrayFromImage(scalarImage);
+  itk::PyBuffer<ScalarImageType>::GetImageFromArray(scalarPyBuffer);
 
 
-        // Test for vector image
-        VectorImageType::Pointer vectorImage = VectorImageType::New();
-        vectorImage->SetRegions(region);
-        vectorImage->SetNumberOfComponentsPerPixel(3);
-        vectorImage->Allocate();
+  // Test for vector image
+  VectorImageType::Pointer vectorImage = VectorImageType::New();
+  vectorImage->SetRegions(region);
+  vectorImage->SetNumberOfComponentsPerPixel(3);
+  vectorImage->Allocate();
 
-        PyObject* vectorPyBuffer = itk::PyBuffer<VectorImageType>::GetArrayFromImage(vectorImage);
-        //itk::PyBuffer<VectorImageType>::GetImageFromArray(vectorPyBuffer);
-        itk::PyBuffer<ScalarImageType>::GetImageFromArray(vectorPyBuffer);
-        
-    }
-    catch(itk::ExceptionObject &err)
-    {
-        (&err)->Print(std::cerr);
-        return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
+  PyObject* vectorPyBuffer = itk::PyBuffer<VectorImageType>::GetArrayFromImage(vectorImage);
+  //itk::PyBuffer<VectorImageType>::GetImageFromArray(vectorPyBuffer);
+  itk::PyBuffer<ScalarImageType>::GetImageFromArray(vectorPyBuffer);
+  }
+catch( itk::ExceptionObject & error )
+  {
+  std::cerr << "Error: " << error << std::endl;
+  return EXIT_FAILURE;
+  }
+
+return EXIT_SUCCESS;
 }

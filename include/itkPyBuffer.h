@@ -37,12 +37,14 @@ namespace itk
 {
 
 /** \class PyBuffer
+ *
  *  \brief Helper class for converting C buffers into python arrays.
  *
  *  This class will receive a C buffer and create the equivalent python
  *  array. This permits passing image buffers into python arrays from
  *  the NumPy python package.
  *
+ *  \ingroup NumPyConversion
  */
 template <typename TImage>
 class PyBuffer

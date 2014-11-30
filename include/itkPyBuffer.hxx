@@ -39,56 +39,56 @@ namespace itk
 template<class TImage>
 PyObject *
 PyBuffer<TImage>
-::GetArrayFromImage( ImageType * image, bool keepAxes)
+::GetArrayFromImage( ImageType * image, bool keepAxes )
 {
   if( !image )
-  {
+    {
     throw std::runtime_error("Input image is null");
-  }
+    }
 
   image->Update();
 
   ComponentType *buffer =  const_cast < ComponentType *> (reinterpret_cast< const ComponentType* > ( image->GetBufferPointer() ) );
   char * data = (char *)( buffer );
 
-  int nrOfComponents = image->GetNumberOfComponentsPerPixel();
+  const int numberOfComponents = image->GetNumberOfComponentsPerPixel();
 
-  int item_type = PyTypeTraits<ComponentType>::value;
+  const int item_type = PyTypeTraits<ComponentType>::value;
 
-  int numpyArrayDimension = ( nrOfComponents > 1) ? ImageDimension + 1 : ImageDimension;
+  const int numpyArrayDimension = ( numberOfComponents > 1) ? ImageDimension + 1 : ImageDimension;
 
   // Construct array with dimensions
   npy_intp dimensions[ numpyArrayDimension ];
 
   // Add a dimension if there are more than one component
-  if ( nrOfComponents > 1)
-  {
-    dimensions[0] = nrOfComponents;
-  }
-  int dimensionOffset = ( nrOfComponents > 1) ? 1 : 0;
+  if ( numberOfComponents > 1)
+    {
+    dimensions[0] = numberOfComponents;
+    }
+  const int dimensionOffset = ( numberOfComponents > 1) ? 1 : 0;
 
   SizeType size = image->GetBufferedRegion().GetSize();
-  for(unsigned int d=0; d < ImageDimension; d++ )
-  {
-    dimensions[d + dimensionOffset] = size[d];
-  }
+  for( unsigned int dim = 0; dim < ImageDimension; ++dim )
+    {
+    dimensions[dim + dimensionOffset] = size[dim];
+    }
 
-  if (!keepAxes)
-  {
+  if( !keepAxes )
+    {
     // Reverse dimensions array
     npy_intp reverseDimensions[ numpyArrayDimension ];
-    for(int d=0; d < numpyArrayDimension; d++ )
-    {
-        reverseDimensions[d] = dimensions[numpyArrayDimension - d - 1];
+    for( int dim = 0; dim < numpyArrayDimension; ++dim )
+      {
+      reverseDimensions[dim] = dimensions[numpyArrayDimension - dim - 1];
+      }
+
+    for( int dim = 0; dim < numpyArrayDimension; ++dim )
+      {
+      dimensions[dim] = reverseDimensions[dim];
+      }
     }
 
-    for(int d=0; d < numpyArrayDimension; d++ )
-    {
-        dimensions[d] = reverseDimensions[d];
-    }
-  }
-
-  int flags = (keepAxes? NPY_ARRAY_F_CONTIGUOUS : NPY_ARRAY_C_CONTIGUOUS) |
+  const int flags = (keepAxes? NPY_ARRAY_F_CONTIGUOUS : NPY_ARRAY_C_CONTIGUOUS) |
               NPY_WRITEABLE;
 
   PyObject * obj = PyArray_New(&PyArray_Type, numpyArrayDimension, dimensions, item_type, NULL, data, 0, flags, NULL);
@@ -97,71 +97,65 @@ PyBuffer<TImage>
 }
 
 template<class TImage>
-const typename PyBuffer<TImage>::OutImagePointer
+const typename PyBuffer<TImage>::OutputImagePointer
 PyBuffer<TImage>
 ::GetImageFromArray( PyObject *obj )
 {
+  const int elementType = PyTypeTraits<ComponentType>::value;
 
-    int element_type = PyTypeTraits<ComponentType>::value;
+  PyArrayObject * array = (PyArrayObject *) PyArray_ContiguousFromObject( obj,
+                                                                          elementType,
+                                                                          ImageDimension,
+                                                                          ImageDimension  );
 
-    PyArrayObject * parray =
-          (PyArrayObject *) PyArray_ContiguousFromObject(
-                                                    obj,
-                                                    element_type,
-                                                    ImageDimension,
-                                                    ImageDimension  );
+  if( array == NULL )
+    {
+    throw std::runtime_error("Contiguous array couldn't be created from input python object");
+    }
 
-    if( parray == NULL )
-      {
-      throw std::runtime_error("Contiguous array couldn't be created from input python object");
-      }
+  const unsigned int imageDimension = array->nd;
 
-    const unsigned int imageDimension = parray->nd;
+  SizeType size;
 
-    SizeType size;
+  SizeValueType numberOfPixels = 1;
+  for( unsigned int dim = 0; dim < imageDimension; ++dim )
+    {
+    size[imageDimension - dim - 1] = array->dimensions[dim];
+    numberOfPixels *= array->dimensions[dim];
+    }
 
-    unsigned int numberOfPixels = 1;
+  IndexType start;
+  start.Fill( 0 );
 
-    for( unsigned int d=0; d<imageDimension; d++ )
-      {
-      size[imageDimension - d - 1]         = parray->dimensions[d];
-      numberOfPixels *= parray->dimensions[d];
-      }
+  RegionType region;
+  region.SetIndex( start );
+  region.SetSize( size );
 
-    IndexType start;
-    start.Fill( 0 );
+  PointType origin;
+  origin.Fill( 0.0 );
 
-    RegionType region;
-    region.SetIndex( start );
-    region.SetSize( size );
+  SpacingType spacing;
+  spacing.Fill( 1.0 );
 
-    PointType origin;
-    origin.Fill( 0.0 );
+  typedef ImportImageFilter< ComponentType, ImageDimension > ImporterType;
+  typename ImporterType::Pointer importer = ImporterType::New();
+  importer->SetRegion( region );
+  importer->SetOrigin( origin );
+  importer->SetSpacing( spacing );
+  const bool importImageFilterWillOwnTheBuffer = false;
 
-    SpacingType spacing;
-    spacing.Fill( 1.0 );
+  ComponentType * data = (ComponentType *)array->data;
 
-    ImporterPointer importer = ImporterType::New();
-    importer->SetRegion( region );
-    importer->SetOrigin( origin );
-    importer->SetSpacing( spacing );
+  importer->SetImportPointer( data,
+                              numberOfPixels,
+                              importImageFilterWillOwnTheBuffer );
 
-    const bool importImageFilterWillOwnTheBuffer = false;
+  importer->Update();
+  OutputImagePointer output = importer->GetOutput();
+  output->DisconnectPipeline();
 
-    ComponentType * data = (ComponentType *)parray->data;
-
-    importer->SetImportPointer(
-                        data,
-                        numberOfPixels,
-                        importImageFilterWillOwnTheBuffer );
-
-    importer->Update();
-    OutImagePointer output = importer->GetOutput();
-    output->DisconnectPipeline();
-
-    return output;
+  return output;
 }
-
 
 } // namespace itk
 

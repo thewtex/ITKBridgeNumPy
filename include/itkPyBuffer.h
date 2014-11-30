@@ -28,6 +28,8 @@
 // The python header defines _POSIX_C_SOURCE without a preceding #undef
 #undef _POSIX_C_SOURCE
 #include <Python.h>
+// This should eventually be replaced with something that uses the buffer-api
+// like the implementation in SimpleITK
 #include <numpy/arrayobject.h>
 
 
@@ -37,41 +39,33 @@ namespace itk
 /** \class PyBuffer
  *  \brief Helper class for converting C buffers into python arrays.
  *
- *  This class will receive a C buffer and create the equivalen python
- *  array. This permits to pass image buffers into python arrays from
- *  the Numeric python package.
+ *  This class will receive a C buffer and create the equivalent python
+ *  array. This permits passing image buffers into python arrays from
+ *  the NumPy python package.
  *
  */
-
 template <typename TImage>
 class PyBuffer
 {
 public:
-  ///! Standard "Self" typedef.
+  /** Standard "Self" typedef. */
   typedef PyBuffer         Self;
 
-  /// Type of the image from where the buffer will be converted
-  typedef TImage                              ImageType;
-  typedef typename ImageType::PixelType       PixelType;
-  typedef typename ImageType::SizeType        SizeType;
-  typedef typename ImageType::IndexType       IndexType;
-  typedef typename ImageType::RegionType      RegionType;
-  typedef typename ImageType::PointType       PointType;
-  typedef typename ImageType::SpacingType     SpacingType;
-  typedef typename ImageType::Pointer         ImagePointer;
+  /** Type of the image from which the buffer will be converted */
+  typedef TImage                                                       ImageType;
+  typedef typename ImageType::PixelType                                PixelType;
+  typedef typename ImageType::SizeType                                 SizeType;
+  typedef typename ImageType::IndexType                                IndexType;
+  typedef typename ImageType::RegionType                               RegionType;
+  typedef typename ImageType::PointType                                PointType;
+  typedef typename ImageType::SpacingType                              SpacingType;
+  typedef typename ImageType::Pointer                                  ImagePointer;
   typedef typename DefaultConvertPixelTraits<PixelType>::ComponentType ComponentType;
 
    /** Image dimension. */
-  itkStaticConstMacro(ImageDimension, unsigned int,
-                      ImageType::ImageDimension);
+  itkStaticConstMacro(ImageDimension, unsigned int, ImageType::ImageDimension);
 
-
-  /// Type of the import image filter
-  typedef ImportImageFilter< ComponentType,
-                             ImageDimension >   ImporterType;
-
-  typedef typename ImporterType::Pointer   ImporterPointer;
-  typedef typename Image<ComponentType, ImageDimension>::Pointer  OutImagePointer;
+  typedef typename Image< ComponentType, ImageDimension >::Pointer  OutputImagePointer;
 
   /**
    * Get an Array with the content of the image buffer
@@ -81,13 +75,13 @@ public:
   /**
    * Get an ITK image from a Python array
    */
-  static const OutImagePointer GetImageFromArray( PyObject *obj );
-
+  static const OutputImagePointer GetImageFromArray( PyObject *obj );
 
 protected:
-  PyBuffer(const Self&);     // Not implemented.
-  void operator=(const Self&); // Not implemented.
 
+private:
+  PyBuffer(const Self&);       // Purposely not implemented.
+  void operator=(const Self&); // Purposely not implemented.
 };
 
 // This declaration is void of a definition, so that unsupported types

@@ -6,6 +6,7 @@ itk_module(BridgeNumPy
     ITKCommon
   TEST_DEPENDS
     ITKTestKernel
+  EXCLUDE_FROM_DEFAULT
   DESCRIPTION
     "${DOCUMENTATION}"
   )

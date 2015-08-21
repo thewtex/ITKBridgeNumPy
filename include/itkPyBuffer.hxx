@@ -15,8 +15,8 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef __itkPyBuffer_hxx
-#define __itkPyBuffer_hxx
+#ifndef itkPyBuffer_hxx
+#define itkPyBuffer_hxx
 
 #include "itkPyBuffer.h"
 

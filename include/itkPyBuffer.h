@@ -16,8 +16,8 @@
  *
  *=========================================================================*/
 
-#ifndef __itkPyBuffer_h
-#define __itkPyBuffer_h
+#ifndef itkPyBuffer_h
+#define itkPyBuffer_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"

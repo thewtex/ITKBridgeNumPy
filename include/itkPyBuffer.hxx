@@ -15,8 +15,8 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef __itkPyBuffer_hxx
-#define __itkPyBuffer_hxx
+#ifndef itkPyBuffer_hxx
+#define itkPyBuffer_hxx
 
 #include "itkPyBuffer.h"
 
@@ -58,7 +58,7 @@ PyBuffer<TImage>
   const int numpyArrayDimension = ( numberOfComponents > 1) ? ImageDimension + 1 : ImageDimension;
 
   // Construct array with dimensions
-  npy_intp dimensions[ numpyArrayDimension ];
+  npy_intp *dimensions = new npy_intp[numpyArrayDimension];
 
   // Add a dimension if there are more than one component
   if ( numberOfComponents > 1)
@@ -76,7 +76,7 @@ PyBuffer<TImage>
   if( !keepAxes )
     {
     // Reverse dimensions array
-    npy_intp reverseDimensions[ numpyArrayDimension ];
+    npy_intp *reverseDimensions = new npy_intp[ numpyArrayDimension ];
     for( int dim = 0; dim < numpyArrayDimension; ++dim )
       {
       reverseDimensions[dim] = dimensions[numpyArrayDimension - dim - 1];
@@ -86,12 +86,16 @@ PyBuffer<TImage>
       {
       dimensions[dim] = reverseDimensions[dim];
       }
+
+    delete[] reverseDimensions;
     }
 
   const int flags = (keepAxes? NPY_ARRAY_F_CONTIGUOUS : NPY_ARRAY_C_CONTIGUOUS) |
               NPY_WRITEABLE;
 
   PyObject * obj = PyArray_New(&PyArray_Type, numpyArrayDimension, dimensions, itemType, NULL, data, 0, flags, NULL);
+
+  delete[] dimensions;
 
   return obj;
 }

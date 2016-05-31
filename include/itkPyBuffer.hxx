@@ -53,7 +53,6 @@ PyBuffer<TImage>
 
   for( unsigned int dim = 0; dim < ImageDimension; ++dim )
     {
-    std::cout << "size["<<dim <<"]::" << size[dim] << std::endl;
     len *= size[dim];
     }
 

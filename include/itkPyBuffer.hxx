@@ -110,7 +110,7 @@ PyBuffer<TImage>
 
   NumOfComponent=(int)PyInt_AsLong(numOfComponent);
 
-  for(unsigned int i=0 ; i< dimension; ++i)
+  for( unsigned int i = 0; i < dimension; ++i )
     {
     item = PySequence_Fast_GET_ITEM(shapeseq,i);
     size[i] = (SizeValueType)PyInt_AsLong(item);

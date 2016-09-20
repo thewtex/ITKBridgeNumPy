@@ -23,8 +23,8 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /usr/src/ITKBridgeNumPy-build
 WORKDIR /usr/src
 
-# release 2016-09-11
-ENV ITK_GIT_TAG 049183e82919275d4f4c3273bbf80738ee469527
+# master 2016-09-20
+ENV ITK_GIT_TAG a1ad10b3b7269e494e96cfbbec64826b752de75f
 RUN git clone https://itk.org/ITK.git && \
   cd ITK && \
   git checkout ${ITK_GIT_TAG} && \

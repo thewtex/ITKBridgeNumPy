@@ -153,6 +153,8 @@ PyBuffer<TImage>
   OutputImagePointer output = importer->GetOutput();
   output->DisconnectPipeline();
 
+  PyBuffer_Release(&pyBuffer);
+
   return output;
 }
 

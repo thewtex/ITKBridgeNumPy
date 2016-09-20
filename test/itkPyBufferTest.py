@@ -30,16 +30,16 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
         pass
 
     def test_NumPyBridge_itkScalarImage(self):
-        "try all sitk pixel type to convert to NumPy array view"
+        "Try to convert all pixel types to NumPy array view"
 
         Dimension             = 3
         ScalarImageType       = itk.Image[itk.UC, Dimension]
         RegionType            = itk.ImageRegion[Dimension]
 
         region                = RegionType()
-        region.SetSize(0,30);
-        region.SetSize(1,20);
-        region.SetSize(2,10);
+        region.SetSize(0, 30);
+        region.SetSize(1, 20);
+        region.SetSize(2, 10);
 
         scalarImage           = ScalarImageType.New()
         scalarImage.SetRegions(region);
@@ -56,19 +56,19 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
         ScalarDiffFilter.Update()
         diff = ScalarDiffFilter.GetTotalDifference()
 
-        self.assertEqual( 0,diff)
+        self.assertEqual(0, diff)
 
     def test_NumPyBridge_itkVectorImage(self):
-        "try all sitk pixel type to convert to NumPy array view"
+        "Try to convert all pixel types to NumPy array view"
 
         Dimension             = 3
         VectorImageType       = itk.VectorImage[itk.UC, Dimension]
         RegionType            = itk.ImageRegion[Dimension]
 
         region                = RegionType()
-        region.SetSize(0,30);
-        region.SetSize(1,20);
-        region.SetSize(2,10);
+        region.SetSize(0, 30);
+        region.SetSize(1, 20);
+        region.SetSize(2, 10);
 
         vectorImage           = VectorImageType.New()
         vectorImage.SetRegions(region);

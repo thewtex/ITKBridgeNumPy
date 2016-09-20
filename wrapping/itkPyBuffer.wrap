@@ -12,8 +12,6 @@ itk_wrap_class("itk::PyBuffer")
       configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/PyBuffer.i.in
                       ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
                       @ONLY)
-      message("---" ${t})
-      message("---" ${ITKT_I${t}${d}})
       file(READ ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
            PyBufferInterfaceTemp)
       file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i

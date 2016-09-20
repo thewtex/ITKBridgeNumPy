@@ -76,7 +76,7 @@ PyBuffer<TImage>
   PyObject *                  shapeseq      = NULL;
   PyObject *                  item          = NULL;
 
-  Py_ssize_t                  buffer_len;
+  Py_ssize_t                  bufferLength;
   Py_buffer                   pyBuffer;
   memset(&pyBuffer, 0, sizeof(Py_buffer));
 
@@ -85,7 +85,7 @@ PyBuffer<TImage>
 
   const void *                buffer;
 
-  int                         NumOfComponent= 1;
+  long                        numberOfComponents= 1;
   unsigned int                dimension     = 0;
 
 
@@ -95,20 +95,20 @@ PyBuffer<TImage>
   if(PyObject_GetBuffer(arr, &pyBuffer, PyBUF_CONTIG) == -1)
     {
     PyErr_SetString( PyExc_RuntimeError, "Cannot get an instance of NumPy array." );
-    PyErr_Clear();
+    PyBuffer_Release(&pyBuffer);
     return NULL;
     }
   else
     {
-    buffer_len = pyBuffer.len;
-    buffer     = pyBuffer.buf;
+    bufferLength = pyBuffer.len;
+    buffer = pyBuffer.buf;
     }
 
   obj        = shape;
   shapeseq   = PySequence_Fast(obj, "expected sequence");
   dimension  = PySequence_Size(obj);
 
-  NumOfComponent=(int)PyInt_AsLong(numOfComponent);
+  numberOfComponents = PyInt_AsLong(numOfComponent);
 
   for( unsigned int i = 0; i < dimension; ++i )
     {
@@ -117,10 +117,12 @@ PyBuffer<TImage>
     numberOfPixels *= size[i];
     }
 
-  len = numberOfPixels*NumOfComponent*pixelSize;
-  if ( buffer_len != len )
+  len = numberOfPixels*numberOfComponents*pixelSize;
+  if ( bufferLength != len )
     {
     PyErr_SetString( PyExc_RuntimeError, "Size mismatch of image and Buffer." );
+    PyBuffer_Release(&pyBuffer);
+    return NULL;
     }
 
   IndexType start;

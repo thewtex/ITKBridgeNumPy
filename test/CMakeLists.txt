@@ -1,13 +1,10 @@
 itk_module_test()
 
-set(BridgeNumPyTests
-  itkPyBufferTest.cxx
+if(ITK_WRAP_PYTHON AND NOT "${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}" VERSION_LESS 4.11)
+  itk_python_add_test(NAME itkPyBufferTest
+                      COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/itkPyBufferTest.py
   )
-
-set(BridgeNumPy-Test_LIBRARIES "${BridgeNumPy-Test_LIBRARIES};${PYTHON_LIBRARY}")
-
-CreateTestDriver(BridgeNumPy "${BridgeNumPy-Test_LIBRARIES}"
-  "${BridgeNumPyTests}")
-
-itk_add_test(NAME itkPyBufferTest
-  COMMAND BridgeNumPyTestDriver itkPyBufferTest)
+  itk_python_add_test(NAME itkPyBufferMemoryLeakTest
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/itkPyBufferMemoryLeakTest.py
+  )
+endif()

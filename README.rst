@@ -8,12 +8,15 @@ This is a port from the original WrapITK PyBuffer to an ITKv4 module.
 
 Differences from the original PyBuffer:
 
-- Support for VectorImages (only for GetArrayFromImage)
+- Support for VectorImage's
 - Option to not swap the axes (only for GetArrayFromImage)
-- Some rudimental tests
-- No support for numarray
+- Tests
+- Based on the `Python Buffer Protocol <https://docs.python.org/3/c-api/buffer.html>`_ -- does not require NumPy to build.
 
-TODO:
+This module is available in the ITK source tree as a Remote
+module.  To enable it, set::
 
-- Add features also to GetImageFromArray
-- Improve tests
+  ITK_WRAP_PYTHON:BOOL=ON
+  Module_BridgeNumPy:BOOL=ON
+
+in ITK's CMake build configuration.

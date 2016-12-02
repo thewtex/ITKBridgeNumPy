@@ -78,6 +78,65 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
 
         convertedvectorImage  = itk.PyBuffer[VectorImageType].GetImageFromArray(vectorndarr, isVector=True)
 
+    def test_NumPyBridge_itkRGBImage(self):
+        "Try to convert an RGB ITK image to NumPy array view"
+
+        Dimension             = 3
+        PixelType             = itk.RGBPixel[itk.UC]
+        RGBImageType          = itk.Image[PixelType, Dimension]
+        RegionType            = itk.ImageRegion[Dimension]
+
+        region                = RegionType()
+        region.SetSize(0, 30);
+        region.SetSize(1, 20);
+        region.SetSize(2, 10);
+
+        rgbImage              = RGBImageType.New()
+        rgbImage.SetRegions(region);
+        rgbImage.Allocate();
+        rgbndarr              = itk.PyBuffer[RGBImageType].GetArrayFromImage(rgbImage)
+
+        convertedRGBImage     = itk.PyBuffer[RGBImageType].GetImageFromArray(rgbndarr, isVector=True)
+
+    def test_NumPyBridge_itkRGBAImage(self):
+        "Try to convert an RGBA ITK image to NumPy array view"
+
+        Dimension             = 3
+        PixelType             = itk.RGBAPixel[itk.UC]
+        RGBAImageType         = itk.Image[PixelType, Dimension]
+        RegionType            = itk.ImageRegion[Dimension]
+
+        region                = RegionType()
+        region.SetSize(0, 30);
+        region.SetSize(1, 20);
+        region.SetSize(2, 10);
+
+        rgbaImage             = RGBAImageType.New()
+        rgbaImage.SetRegions(region);
+        rgbaImage.Allocate();
+        rgbandarr             = itk.PyBuffer[RGBAImageType].GetArrayFromImage(rgbaImage)
+
+        convertedRGBAImage    = itk.PyBuffer[RGBAImageType].GetImageFromArray(rgbandarr, isVector=True)
+
+    def test_NumPyBridge_itkVectorPixelImage(self):
+        "Try to convert an ITK image with vector pixels to NumPy array view"
+
+        Dimension             = 3
+        PixelType             = itk.Vector[itk.F,Dimension]
+        VectorImageType       = itk.Image[PixelType, Dimension]
+        RegionType            = itk.ImageRegion[Dimension]
+
+        region                = RegionType()
+        region.SetSize(0, 30);
+        region.SetSize(1, 20);
+        region.SetSize(2, 10);
+
+        vectorImage           = VectorImageType.New()
+        vectorImage.SetRegions(region);
+        vectorImage.Allocate();
+        vectorndarr           = itk.PyBuffer[VectorImageType].GetArrayFromImage(vectorImage)
+
+        convertedVectorImage  = itk.PyBuffer[VectorImageType].GetImageFromArray(vectorndarr, isVector=True)
 
 if __name__ == '__main__':
     unittest.main()

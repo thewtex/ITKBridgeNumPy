@@ -1,0 +1,76 @@
+%extend itkPyVnl@PyVnlTypes@{
+    %pythoncode %{
+
+    def GetArrayFromVnlVector(vnl_vector):
+        """  Get a NumPy array from a Vnl vector.  """
+
+        if not HAVE_NUMPY:
+            raise ImportError('Numpy not available.')
+
+        itksize = vnl_vector.size()
+        shape   = [itksize]
+
+        pixelType     = "@PixelType@"
+        numpydatatype = _get_numpy_pixelid(pixelType)
+        memview       = itkPyVnl@PyVnlTypes@._GetArrayFromVnlVector(vnl_vector)
+        itkndarrview  = numpy.asarray(memview).view(dtype = numpydatatype).reshape(shape).view(itkndarray)
+        itkndarrview.SetConvertedFlag(converted = True)
+
+        return itkndarrview
+
+    GetArrayFromVnlVector = staticmethod(GetArrayFromVnlVector)
+
+    def GetVnlVectorFromArray(ndarr):
+        """ Get a Vnl vector from a NumPy array. """
+
+        if not HAVE_NUMPY:
+            raise ImportError('Numpy not available.')
+
+        assert ndarr.ndim == 1 , \
+            "Only arrays of 1 dimension are supported."
+
+        vecview = itkPyVnl@PyVnlTypes@._GetVnlVectorFromArray( ndarr, ndarr.shape)
+
+        return vecview
+
+    GetVnlVectorFromArray = staticmethod(GetVnlVectorFromArray)
+
+    def GetArrayFromVnlMatrix(vnl_matrix):
+        """  Get a NumPy array from a VNL matrix.  """
+
+        if not HAVE_NUMPY:
+            raise ImportError('Numpy not available.')
+
+        cols = vnl_matrix.columns()
+        rows = vnl_matrix.rows()
+        dim     = 2
+        shape   = [rows,cols]
+
+        pixelType     = "@PixelType@"
+        numpydatatype = _get_numpy_pixelid(pixelType)
+        memview       = itkPyVnl@PyVnlTypes@._GetArrayFromVnlMatrix(vnl_matrix)
+        itkndarrview  = numpy.asarray(memview).view(dtype = numpydatatype).reshape(shape).view(itkndarray)
+        itkndarrview.SetConvertedFlag(converted = True)
+
+        return itkndarrview
+
+    GetArrayFromVnlMatrix = staticmethod(GetArrayFromVnlMatrix)
+
+    def GetVnlMatrixFromArray(ndarr):
+        """ Get a VNL Matrix from a NumPy array.
+        """
+        
+        if not HAVE_NUMPY:
+            raise ImportError('Numpy not available.')
+
+        assert ndarr.ndim == 2 , \
+            "Only arrays of 2 dimensions are supported."
+
+        matview = itkPyVnl@PyVnlTypes@._GetVnlMatrixFromArray( ndarr, ndarr.shape)
+
+        return matview
+
+    GetVnlMatrixFromArray = staticmethod(GetVnlMatrixFromArray)
+
+  %}
+};

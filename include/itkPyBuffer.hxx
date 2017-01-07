@@ -91,7 +91,16 @@ PyBuffer<TImage>
 
   size_t                      pixelSize     = sizeof(ComponentType);
   size_t                      len           = 1;
-
+  if(PyObject_GetBuffer(arr, &pyBuffer, PyBUF_C_CONTIGUOUS) == -1)
+    {
+    PyErr_SetString( PyExc_RuntimeError,
+    "Array data is not C-style contiguous.\n"
+    "Create a copy (i.e. using '.copy()') of your array first"
+    " to order it C-style." );
+    PyBuffer_Release(&pyBuffer);
+    return NULL;
+    }
+  PyBuffer_Release(&pyBuffer);
   if(PyObject_GetBuffer(arr, &pyBuffer, PyBUF_CONTIG) == -1)
     {
     PyErr_SetString( PyExc_RuntimeError, "Cannot get an instance of NumPy array." );

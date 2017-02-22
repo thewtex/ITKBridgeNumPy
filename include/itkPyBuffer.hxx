@@ -81,6 +81,7 @@ PyBuffer<TImage>
   memset(&pyBuffer, 0, sizeof(Py_buffer));
 
   SizeType size;
+  SizeType sizeFortran;
   SizeValueType numberOfPixels = 1;
 
   const void *                buffer;
@@ -91,17 +92,8 @@ PyBuffer<TImage>
 
   size_t                      pixelSize     = sizeof(ComponentType);
   size_t                      len           = 1;
-  if(PyObject_GetBuffer(arr, &pyBuffer, PyBUF_C_CONTIGUOUS) == -1)
-    {
-    PyErr_SetString( PyExc_RuntimeError,
-    "Array data is not C-style contiguous.\n"
-    "Create a copy (i.e. using '.copy()') of your array first"
-    " to order it C-style." );
-    PyBuffer_Release(&pyBuffer);
-    return NULL;
-    }
-  PyBuffer_Release(&pyBuffer);
-  if(PyObject_GetBuffer(arr, &pyBuffer, PyBUF_CONTIG) == -1)
+
+  if(PyObject_GetBuffer(arr, &pyBuffer, PyBUF_WRITABLE | PyBUF_ND | PyBUF_ANY_CONTIGUOUS ) == -1)
     {
     PyErr_SetString( PyExc_RuntimeError, "Cannot get an instance of NumPy array." );
     PyBuffer_Release(&pyBuffer);
@@ -112,6 +104,7 @@ PyBuffer<TImage>
     bufferLength = pyBuffer.len;
     buffer = pyBuffer.buf;
     }
+  PyBuffer_Release(&pyBuffer);
 
   obj        = shape;
   shapeseq   = PySequence_Fast(obj, "expected sequence");
@@ -123,7 +116,14 @@ PyBuffer<TImage>
     {
     item = PySequence_Fast_GET_ITEM(shapeseq,i);
     size[i] = (SizeValueType)PyInt_AsLong(item);
+    sizeFortran[dimension - 1 - i] = (SizeValueType)PyInt_AsLong(item);
     numberOfPixels *= size[i];
+    }
+
+  bool isFortranContiguous = false;
+  if( pyBuffer.strides != NULL && pyBuffer.itemsize == pyBuffer.strides[0] )
+    {
+    isFortranContiguous = true;
     }
 
   len = numberOfPixels*numberOfComponents*pixelSize;
@@ -140,6 +140,14 @@ PyBuffer<TImage>
   RegionType region;
   region.SetIndex( start );
   region.SetSize( size );
+  if( isFortranContiguous )
+    {
+    region.SetSize( sizeFortran );
+    }
+  else
+    {
+    region.SetSize( size );
+    }
 
   PointType origin;
   origin.Fill( 0.0 );

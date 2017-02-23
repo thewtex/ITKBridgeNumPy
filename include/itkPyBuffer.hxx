@@ -26,11 +26,13 @@ namespace itk
 template<class TImage>
 PyObject *
 PyBuffer<TImage>
-::_GetArrayFromImage( ImageType * image)
+::_GetArrayFromImage( ImageType * image, PyObject * shape, PyObject * keepAxes )
 {
   PyObject *                  memoryView    = NULL;
   Py_buffer                   pyBuffer;
   memset(&pyBuffer, 0, sizeof(Py_buffer));
+  PyObject *                  shapeseq      = NULL;
+  PyObject *                  item          = NULL;
 
   Py_ssize_t                  len           = 1;
   size_t                      pixelSize     = sizeof(ComponentType);
@@ -59,9 +61,42 @@ PyBuffer<TImage>
   len *= numberOfComponents;
   len *= pixelSize;
 
-  res = PyBuffer_FillInfo(&pyBuffer, NULL, (void*)itkImageBuffer, len, 0, PyBUF_CONTIG);
+  pyBuffer.itemsize = pixelSize;
+
+  const long fortranOrder = PyLong_AsLong(keepAxes);
+  shapeseq   = PySequence_Fast(shape, "expected sequence");
+  Py_ssize_t * bufShape = new Py_ssize_t[ImageDimension];
+  for( unsigned int dim = 0; dim < ImageDimension; ++dim )
+    {
+    item = PySequence_Fast_GET_ITEM(shapeseq,dim);
+    bufShape[dim] = static_cast< Py_ssize_t >( PyInt_AsLong(item) );
+    }
+  pyBuffer.shape = bufShape;
+
+  Py_ssize_t * strides = new Py_ssize_t[ImageDimension];
+  char order = 'C';
+  if( fortranOrder )
+    {
+    order = 'F';
+    }
+  PyBuffer_FillContiguousStrides(static_cast< int >(ImageDimension), bufShape, strides, pyBuffer.itemsize, order);
+  pyBuffer.strides = strides;
+
+  int flags = PyBUF_WRITABLE | PyBUF_ND;
+  if( fortranOrder )
+    {
+    flags |= PyBUF_F_CONTIGUOUS;
+    }
+  else
+    {
+    flags |= PyBUF_C_CONTIGUOUS;
+    }
+
+  res = PyBuffer_FillInfo(&pyBuffer, NULL, (void*)itkImageBuffer, len, 0, flags);
   memoryView = PyMemoryView_FromBuffer(&pyBuffer);
 
+  delete[] bufShape;
+  delete[] strides;
   PyBuffer_Release(&pyBuffer);
 
   return memoryView;
@@ -72,7 +107,6 @@ const typename PyBuffer<TImage>::OutputImagePointer
 PyBuffer<TImage>
 ::_GetImageFromArray( PyObject *arr, PyObject *shape, PyObject *numOfComponent)
 {
-  PyObject *                  obj           = NULL;
   PyObject *                  shapeseq      = NULL;
   PyObject *                  item          = NULL;
 
@@ -106,9 +140,8 @@ PyBuffer<TImage>
     }
   PyBuffer_Release(&pyBuffer);
 
-  obj        = shape;
-  shapeseq   = PySequence_Fast(obj, "expected sequence");
-  dimension  = PySequence_Size(obj);
+  shapeseq   = PySequence_Fast(shape, "expected sequence");
+  dimension  = PySequence_Size(shape);
 
   numberOfComponents = PyInt_AsLong(numOfComponent);
 

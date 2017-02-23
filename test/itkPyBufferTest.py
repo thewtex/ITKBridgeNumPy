@@ -175,5 +175,17 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
         index[1] = 1
         assert(image.GetPixel(index) == 3)
 
+        arrC = itk.PyBuffer[ImageType].GetArrayFromImage(image)
+        print(image.GetLargestPossibleRegion().GetSize())
+        print(arrC)
+        print(arrC.flags)
+        print(arrC.shape)
+        arrFortran = itk.PyBuffer[ImageType].GetArrayFromImage(image,
+                keepAxes=True)
+        print(image.GetLargestPossibleRegion().GetSize())
+        print(arrFortran)
+        print(arrFortran.flags)
+        print(arrFortran.shape)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

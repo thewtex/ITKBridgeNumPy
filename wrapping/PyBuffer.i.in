@@ -17,12 +17,15 @@
             shape = [image.GetNumberOfComponentsPerPixel(), ] + shape
 
         if keepAxes == False:
+            order = 'C'
             shape = shape[::-1]
+        else:
+            order = 'F'
 
         pixelType     = "@PixelType@"
         numpydatatype = _get_numpy_pixelid(pixelType)
-        memview       = itkPyBuffer@PyBufferTypes@._GetArrayFromImage(image)
-        itkndarrview  = numpy.asarray(memview).view(dtype = numpydatatype).reshape(shape).view(itkndarray)
+        memview       = itkPyBuffer@PyBufferTypes@._GetArrayFromImage(image, shape, int(keepAxes))
+        itkndarrview  = numpy.asarray(memview, order=order).view(dtype=numpydatatype).view(itkndarray)
         itkndarrview.SetConvertedFlag(converted = True)
 
         return itkndarrview

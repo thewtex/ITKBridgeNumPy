@@ -72,7 +72,6 @@ const typename PyBuffer<TImage>::OutputImagePointer
 PyBuffer<TImage>
 ::_GetImageFromArray( PyObject *arr, PyObject *shape, PyObject *numOfComponent)
 {
-  PyObject *                  obj           = NULL;
   PyObject *                  shapeseq      = NULL;
   PyObject *                  item          = NULL;
 
@@ -106,9 +105,8 @@ PyBuffer<TImage>
     }
   PyBuffer_Release(&pyBuffer);
 
-  obj        = shape;
-  shapeseq   = PySequence_Fast(obj, "expected sequence");
-  dimension  = PySequence_Size(obj);
+  shapeseq   = PySequence_Fast(shape, "expected sequence");
+  dimension  = PySequence_Size(shape);
 
   numberOfComponents = PyInt_AsLong(numOfComponent);
 

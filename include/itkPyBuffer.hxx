@@ -129,6 +129,7 @@ PyBuffer<TImage>
     {
     PyErr_SetString( PyExc_RuntimeError, "Size mismatch of image and Buffer." );
     PyBuffer_Release(&pyBuffer);
+    Py_DECREF(shapeseq);
     return NULL;
     }
 
@@ -170,6 +171,7 @@ PyBuffer<TImage>
   OutputImagePointer output = importer->GetOutput();
   output->DisconnectPipeline();
 
+  Py_DECREF(shapeseq);
   PyBuffer_Release(&pyBuffer);
 
   return output;

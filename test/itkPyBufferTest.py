@@ -138,5 +138,42 @@ class TestNumpyITKMemoryviewInterface(unittest.TestCase):
 
         convertedVectorImage  = itk.PyBuffer[VectorImageType].GetImageFromArray(vectorndarr, isVector=True)
 
+    def test_NumPyBridge_FortranOrder(self):
+        "Try to convert an ITK image to / from a NumPy array with Fortran order"
+
+        Dimension = 2
+        PixelType = itk.ctype('signed short')
+        ImageType = itk.Image[PixelType, Dimension]
+        dtype = np.int16
+
+        arr = np.arange(6, dtype=dtype)
+        arrC = np.reshape(arr, (2, 3), order='C')
+        assert(arrC.flags.c_contiguous)
+        image = itk.PyBuffer[ImageType].GetImageFromArray(arrC)
+
+        index = itk.Index[Dimension]()
+        index[0] = 0
+        index[1] = 0
+        assert(image.GetPixel(index) == 0)
+        index[0] = 1
+        index[1] = 0
+        assert(image.GetPixel(index) == 1)
+        index[0] = 0
+        index[1] = 1
+        assert(image.GetPixel(index) == 3)
+
+        arrFortran = np.reshape(arr, (3, 2), order='F')
+        assert(arrFortran.flags.f_contiguous)
+        image = itk.PyBuffer[ImageType].GetImageFromArray(arrFortran)
+        index[0] = 0
+        index[1] = 0
+        assert(image.GetPixel(index) == 0)
+        index[0] = 1
+        index[1] = 0
+        assert(image.GetPixel(index) == 1)
+        index[0] = 0
+        index[1] = 1
+        assert(image.GetPixel(index) == 3)
+
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)

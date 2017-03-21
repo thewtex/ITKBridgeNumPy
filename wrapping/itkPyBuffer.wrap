@@ -4,6 +4,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PyBuffer.i.init"
 itk_wrap_class("itk::PyBuffer")
   UNIQUE(types "${WRAP_ITK_SCALAR};UC;D;US;UI;UL;SC;SS;SI;SL;F")
   foreach(t ${types})
+    string(REGEX MATCHALL "(V${t}|CV${t})" VectorTypes ${WRAP_ITK_VECTOR})
     set(PixelType ${t})
     foreach(d ${ITK_WRAP_DIMS})
       if( DEFINED ITKT_I${t}${d} )
@@ -36,18 +37,19 @@ itk_wrap_class("itk::PyBuffer")
       endforeach(p)
       # Image Vector types
       foreach(vec_dim ${ITK_WRAP_VECTOR_COMPONENTS})
-        list(FIND WRAP_ITK_VECTOR "V${t}" pos)
-        if( NOT ${pos} EQUAL -1 AND DEFINED ITKM_IV${t}${vec_dim}${d} )
-          itk_wrap_template("${ITKM_IV${t}${vec_dim}${d}}" "${ITKT_IV${t}${vec_dim}${d}}")
-          set(PyBufferTypes ${ITKM_IV${t}${vec_dim}${d}})
-          configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/PyBuffer.i.in
-                      ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
-                      @ONLY)
-          file(READ ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
-               PyBufferInterfaceTemp)
-          file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i
-               ${PyBufferInterfaceTemp})
-         endif()
+        foreach(vec_type ${VectorTypes})
+           if( DEFINED ITKM_I${vec_type}${vec_dim}${d} )
+             itk_wrap_template("${ITKM_I${vec_type}${vec_dim}${d}}" "${ITKT_I${vec_type}${vec_dim}${d}}")
+             set(PyBufferTypes ${ITKM_I${vec_type}${vec_dim}${d}})
+             configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/PyBuffer.i.in
+                         ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
+                         @ONLY)
+             file(READ ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
+                  PyBufferInterfaceTemp)
+             file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i
+                  ${PyBufferInterfaceTemp})
+             endif()
+          endforeach()
        endforeach()
     endforeach(d)
   endforeach(t)

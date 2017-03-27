@@ -18,6 +18,20 @@ itk_wrap_class("itk::PyBuffer")
         file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i
              ${PyBufferInterfaceTemp})
       endif()
+
+      # Wraps Symmetric Second Rank tensor images
+      if( DEFINED ITKM_ISSRT${t}${d}${d})
+        itk_wrap_template("${ITKM_ISSRT${t}${d}${d}}" "${ITKT_ISSRT${t}${d}${d}}")
+        set(PyBufferTypes ${ITKM_ISSRT${t}${d}${d}})
+        configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/PyBuffer.i.in
+                        ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
+                        @ONLY)
+        file(READ ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i.temp
+             PyBufferInterfaceTemp)
+        file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/PyBuffer.i
+             ${PyBufferInterfaceTemp})
+      endif()
+
       # Wraps RGB and RGBA types that have been selected to be wrapped.
       # We have to recompute them all to extract the pixel component type.
       foreach(p RGB;RGBA)

@@ -1,3 +1,7 @@
+%begin %{
+#include "PatchedPython27pyconfig.h"
+%}
+
 %extend itkPyVnl@PyVnlTypes@{
     %pythoncode %{
 
